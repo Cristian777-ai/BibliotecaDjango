@@ -5,30 +5,22 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.db.models import Q
+
 from .models import Libro
 from .forms import LibroForm
 
+# Mixins personalizados
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        user = self.request.user
+        return user.is_authenticated and (user.role == 'administrador' or user.is_superuser)
+
 class BorrowerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.role == 'usuario_regular'
+        user = self.request.user
+        return user.is_authenticated and user.role == 'usuario_regular'
 
-class LibroCreateView(CreateView):
-    model = Libro
-    form_class = LibroForm
-    template_name = 'core/libro_form.html'
-    success_url = reverse_lazy('core:libro_list')
-
-class LibroUpdateView(UpdateView):
-    model = Libro
-    form_class = LibroForm
-    template_name = 'core/libro_form.html'
-    success_url = reverse_lazy('core:libro_list')
-
-class LibroDeleteView(DeleteView):
-    model = Libro
-    template_name = 'core/libro_confirm_delete.html'
-    success_url = reverse_lazy('core:libro_list')
-
+# Vistas
 class LibroListView(LoginRequiredMixin, ListView):
     model = Libro
     template_name = 'core/libro_list.html'
@@ -39,15 +31,29 @@ class LibroListView(LoginRequiredMixin, ListView):
         q = self.request.GET.get('q')
         if q:
             qs = qs.filter(
-                Q(title__icontains=q) |
-                Q(author__icontains=q)
+                Q(title__icontains=q) | Q(author__icontains=q)
             )
         return qs
 
-class LibroDetailView(DetailView):
+class LibroDetailView(LoginRequiredMixin, DetailView):
     model = Libro
     template_name = 'core/libro_detail.html'
     context_object_name = 'libro'
+
+class LibroCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+    model = Libro
+    form_class = LibroForm
+    template_name = 'core/libro_form.html'
+
+class LibroUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
+    model = Libro
+    form_class = LibroForm
+    template_name = 'core/libro_form.html'
+
+class LibroDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
+    model = Libro
+    template_name = 'core/libro_confirm_delete.html'
+    success_url = reverse_lazy('core:libro_list')
 
 class LibroBorrowView(LoginRequiredMixin, BorrowerRequiredMixin, View):
     def get(self, request, pk):
@@ -72,12 +78,13 @@ class LibroReturnView(LoginRequiredMixin, BorrowerRequiredMixin, View):
             libro.save()
             messages.success(request, f'Has devuelto “{libro.title}”.')
         return redirect('core:libro_detail', pk=pk)
-    
+
+# Vista para libros prestados por el usuario
 class MisBorrowedListView(LoginRequiredMixin, ListView):
     model = Libro
     template_name = 'core/mis_prestados.html'
     context_object_name = 'libros'
     
     def get_queryset(self):
-        # Devuelve solo los libros que el usuario ha prestado
         return self.request.user.borrowed_books.all()
+
