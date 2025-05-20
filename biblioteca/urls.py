@@ -5,11 +5,13 @@ from rest_framework.routers import DefaultRouter
 from core.api_views import LibroViewSet
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 router = DefaultRouter()
 router.register(r'libros', LibroViewSet, basename='libro')
 
 urlpatterns = [
+    path('', RedirectView.as_view(pattern_name='core:libro_list', permanent=False)),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
