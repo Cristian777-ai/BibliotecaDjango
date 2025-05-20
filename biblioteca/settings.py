@@ -14,7 +14,11 @@ SECRET_KEY = 'django-insecure-dj12)+x@#gy=x1jwxc*hlzgjwp0uh&dn@0dgkxmzqosupq!v90
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'bibliotecaapi-e8ec76dd8fce.herokuapp.com',
+]
 
 
 
