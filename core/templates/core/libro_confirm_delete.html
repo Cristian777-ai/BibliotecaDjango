@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Confirmar borrado{% endblock %}
+{% block content %}
+  <h1 class="mb-3">¿Eliminar “{{ object.title }}”?</h1>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+    <a class="btn btn-secondary ms-2" href="{% url 'core:libro_list' %}">No, volver</a>
+  </form>
+{% endblock %}

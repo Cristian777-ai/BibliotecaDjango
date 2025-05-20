@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Libro{% endblock %}
+
+{% block content %}
+  <h1 class="mb-3">{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Libro</h1>
+
+  <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      {{ form.title.label_tag }}
+      {{ form.title|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.author.label_tag }}
+      {{ form.author|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.publication_year.label_tag }}
+      {{ form.publication_year|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.stock.label_tag }}
+      {{ form.stock|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.cover.label_tag }}
+      {{ form.cover }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a class="btn btn-secondary ms-2" href="{% url 'core:libro_list' %}">Cancelar</a>
+  </form>
+{% endblock %}

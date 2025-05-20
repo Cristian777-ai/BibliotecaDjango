@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Mis libros prestados{% endblock %}
+{% block content %}
+  <h1 class="mb-3">Mis Libros Prestados</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr><th>Título</th><th>Autor</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for libro in libros %}
+        <tr>
+          <td>{{ libro.title }}</td>
+          <td>{{ libro.author }}</td>
+          <td>
+            <a class="btn btn-sm btn-info" href="{% url 'core:libro_detail' libro.pk %}">Ver</a>
+            <a class="btn btn-sm btn-success" href="{% url 'core:libro_return' libro.pk %}">Devolver</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3">No tienes libros prestados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a class="btn btn-secondary" href="{% url 'core:libro_list' %}">Volver al listado general</a>
+{% endblock %}
